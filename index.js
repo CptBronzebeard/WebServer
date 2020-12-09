@@ -42,6 +42,13 @@ app.get('/weather/city', cors(corsOptions), async (request, response) => {
     response.json(weatherResponse)
 })
 
+app.get('/weather/coords', cors(corsOptions), async (request, response) => {
+    const latitude = request.query.lat
+    const longitude = request.query.lon
+    const weatherResponse = await getWeatherByCoords(latitude, longitude)
+    response.json(weatherResponse)
+})
+
 app.get('/favorites', cors(corsOptions), (request, response) => {
     let cities = []
     let userToken = request.cookies.userToken
@@ -125,5 +132,10 @@ async function getWeather(url){
 
 function getWeatherByName(cityName){
     const requestURL = apiUrl + 'q=' + encodeURI(cityName) + '&appid=' + apiKey;
+    return getWeather(requestURL);
+}
+
+function getWeatherByCoords(latitude, longitude){
+    const requestURL = apiUrl + 'lat=' + encodeURI(latitude) + '&lon=' + encodeURI(longitude) + '&appid=' + apiKey;
     return getWeather(requestURL);
 }
