@@ -23,6 +23,11 @@ const corsOptions = {
     headers: 'Origin, X-Requested-With, Content-Type, Accept'
 }
 
+const cookieOptions = {
+  maxAge: 1000 * 60 * 60 * 24 * 90,
+    secure: true
+}
+
 app.options(cors(corsOptions))
 app.use(function (request, response, next) {
     response.header('Access-Control-Allow-Origin', clientLink)
