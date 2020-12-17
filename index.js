@@ -7,14 +7,18 @@ const app = express();
 const Datastore = require('nedb');
 const database = new Datastore({ filename: '.data/database', autoload: true });
 const defCity = 'Vsevolozhsk';
-const clientLink = null;
+const clientLink = process.env.CLIENT_URL;
 const pictureUrl = 'http://openweathermap.org/img/wn/';
 const apiKey = '3d57646fde7625f581c36b64bd01dcfe';
 const apiUrl = 'https://api.openweathermap.org/data/2.5/weather?units=metric&lang=ru&';
 
 app.use(express.json())
 app.use(cookieParser())
+app.listen(443)
+app.listen(8080)
 app.listen(9420)
+
+app.use(express.static('public'))
 
 const corsOptions = {
     origin: clientLink,
@@ -25,6 +29,7 @@ const corsOptions = {
 
 const cookieOptions = {
   maxAge: 1000 * 60 * 60 * 24 * 90,
+  sameSite: "None",
     secure: true
 }
 
