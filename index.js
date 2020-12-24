@@ -74,6 +74,7 @@ app.get('/favorites', cors(corsOptions), async (request, response) => {
     if (error != null) {
       response.json({
         success: false,
+        code: 400,
         message: error
       })
     } else if (docs.length == 0) {
@@ -114,10 +115,11 @@ app.post('/favorites/:city', cors(corsOptions), async (request, response) => {
       if (error != null) {
         response.json({
           success: false,
+          code: 500,
           message: error
         })
       } else if (docs.length !== 0) {
-        response.cookie('userToken', userToken, cookieOptions).json({
+        response.cookie('userToken', userToken, cookieOptions).status(400).json({
           success: true,
           duplicate: true
         })
@@ -134,6 +136,7 @@ app.post('/favorites/:city', cors(corsOptions), async (request, response) => {
           if (error != null) {
             response.json({
               success: false,
+              code: 500,
               message: error
             })
           } else {
@@ -144,7 +147,7 @@ app.post('/favorites/:city', cors(corsOptions), async (request, response) => {
       }
     })
   } else {
-    response.json(failedResponse);
+    response.status(weatherResponse.code).json(failedResponse);
   }
 })
 
@@ -156,6 +159,7 @@ async function getWeather(url) {
       if (data.cod >= 300)
         return {
           success: false,
+          code: data.cod,
           message: data.message
         }
       else {
@@ -165,11 +169,16 @@ async function getWeather(url) {
         }
       }
     } catch (error) {
-      return failedResponse;
+      return {
+        success: false,
+        code: 500,
+        message: 'Error retrieving information from weather server.'
+      }
     }
   } catch (error) {
     return {
       success: false,
+      code: 500,
       message: error
     }
   }
@@ -180,8 +189,9 @@ app.delete('/favorites/:city', cors(corsOptions), async (request, response) => {
   let userToken = request.cookies.userToken
 
   if (!userToken) {
-    response.json({
+    response.status(401).json({
       success: false,
+      code: 401,
       message: 'Unknown user'
     })
   } else {
@@ -192,12 +202,12 @@ app.delete('/favorites/:city', cors(corsOptions), async (request, response) => {
       }
     }, function(error, docs) {
       if (error != null) {
-        response.json({
+        response.status(500).json({
           success: false,
           message: error
         })
       } else if (docs.length === 0) {
-        response.json({
+        response.status(404).json({
           success: false,
           message: 'City is not found in favorites'
         })
@@ -210,7 +220,7 @@ app.delete('/favorites/:city', cors(corsOptions), async (request, response) => {
           }
         }, function(error, numAffected, affectedDocuments, upsert) {
           if (error != null) {
-            response.json({
+            response.status(500).json({
               success: false,
               message: error
             })
